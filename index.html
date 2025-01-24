@@ -53,11 +53,15 @@
   <body class="font-monospace">
     
     <div style="background-color: #323639; min-height: 60px;" class="row text-center p-2">
-        <div class="col-sm-12 col-md-6 mt-2">
-            <button id="AddRow" class="btn rounded-pill btn-outline-light px-5 py-1 m-0"><i class="fa-solid fa-plus me-2"></i><small>ROW ITEM</small></button>
+        <div class="col-sm-12 col-md-4 mt-2">
+            <button id="Download" class="btn rounded-pill btn-primary px-5 py-1 m-0"><i class="fa-regular fa-floppy-disk me-2"></i></i><small>SAVE AND EXIT</small></button>
         </div>
-        <div class="col-sm-12 col-md-6 mt-2">
-            <button id="Download" class="btn rounded-pill btn-outline-light px-5 py-1 m-0"><i class="fa-solid fa-download me-2"></i></i><small>DOWNLOAD</small></button>
+        <div class="col-sm-12 col-md-4 mt-2">
+            <button id="AddRow" class="btn rounded-pill btn-outline-light px-5 py-1 m-0"><i class="fa-solid fa-plus me-2"></i><small>NEW ROW ITEM</small></button>
+        </div>
+        
+        <div class="col-sm-12 col-md-4 mt-2">
+            <button id="Download" class="btn rounded-pill btn-danger px-5 py-1 m-0"><i class="fa-solid fa-download me-2"></i></i><small>DOWNLOAD TO PDF</small></button>
         </div>
     </div>
 
@@ -67,29 +71,29 @@
                 <div class="row">
                     <div class="col-6" style="display: flex; align-items: center;">
                         <p style="margin: 0;">CUSTOMER :</p>
-                        <input class="top-input" type="text" required>
+                        <input class="top-input" type="text" id="customer" required>
                     </div>
                     <div class="col-6" style="display: flex; align-items: center;">
                         <p style="margin: 0;">SALE ID :</p>
-                        <input class="top-input" type="text" required>
+                        <input class="top-input" type="text" id="saleId" required>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-6" style="display: flex; align-items: center;">
                         <p style="margin: 0;">ADDRESS :</p>
-                        <input class="top-input" type="text" required>
+                        <input class="top-input" type="text" id="address" required>
                     </div>
                     <div class="col-6" style="display: flex; align-items: center;">
                         <p style="margin: 0;">DATE :</p>
-                        <input class="top-input" type="text" required>
+                        <input class="top-input" type="text" id="date" required>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-12 d-flex align-items-center">
                         <p style="margin: 0;">PAYMENT METHOD :</p>
-                        <input class="top-input" type="text" required>
+                        <input class="top-input" type="text" id="paymentMethod" required>
                     </div>
                 </div>
             </div>
@@ -210,28 +214,37 @@
             }
             GetTime();
             setInterval(GetTime, 1000);
-            
+
             const table = document.getElementById("table");
             const rows = table.querySelectorAll("tbody tr");
+
+            function TotalAmount() {
+                let counter = 0;
+                rows.forEach(row => {
+                    const numberValue = parseFloat(row.querySelector(".result").value);
+                    if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
+                        counter += numberValue;
+                    }
+                    document.getElementById('TotalAmount').textContent = counter.toFixed(2);
+                });
+            }
+
+            function TotalItems() {
+                let counter = 0;
+                rows.forEach(row => {
+                    const numberValue = parseFloat(row.querySelector(".input1").value);
+                    if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
+                        counter += numberValue;
+                    }
+                });
+                document.getElementById('ItemCount').textContent = counter;
+            }
 
             rows.forEach(row => {
                 const input1 = row.querySelector(".input1");
                 const input2 = row.querySelector(".input2");
                 const result = row.querySelector(".result");
                 const text = row.querySelector(".text1");
-
-                function TotalAmount() {
-                    let counter = 0;
-                    rows.forEach(row => {
-                        const numberValue = parseFloat(row.querySelector(".result").value);
-
-                        if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
-                            counter += numberValue;
-                        }
-                        document.getElementById('TotalAmount').textContent = counter.toFixed(2);
-                    });
-
-                }
 
                 function calculateAndUpdate() {
                     const value1 = parseFloat(input1.value) || 0;
@@ -251,21 +264,37 @@
 
                 text.addEventListener("input", IncreaseHeight);
 
-                function TotalItems() {
-                    let counter = 0;
-                    rows.forEach(row => {
-                        const numberValue = parseFloat(row.querySelector(".input1").value);
-
-                        if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
-                            counter += numberValue;
-                        }
-                        document.getElementById('ItemCount').textContent = counter;
-                    });
-
-                }
-
                 input1.addEventListener("input", TotalItems);
             });
+        });
+
+        function SaveTable() {
+            const table = document.getElementById('table');
+            const rows = table.querySelectorAll('tbody tr');
+            TableData = [];
+            const primaryData = [];
+            primaryData.push(document.getElementById('customer').value);
+            primaryData.push(document.getElementById('saleId').value);
+            primaryData.push(document.getElementById('address').value);
+            primaryData.push(document.getElementById('date').value);
+            primaryData.push(document.getElementById('paymentMethod').value);
+            TableData.push(primaryData);
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                cells.forEach(cell => {
+                    const input = cell.querySelector('input');
+                    if (input) {
+                        rowData.push(input.value);
+                    }
+                });
+                TableData.push(rowData);
+            });
+            console.log(TableData);
+        }
+
+        document.querySelectorAll('#table td input').forEach(cell => {
+            cell.addEventListener('input', SaveTable);
         });
 
         function setInputFilter(textbox, inputFilter, errMsg) {
@@ -342,24 +371,33 @@
             const table = document.getElementById("table");
             const rows = table.querySelectorAll("tbody tr");
 
+            function TotalAmount() {
+                let counter = 0;
+                rows.forEach(row => {
+                    const numberValue = parseFloat(row.querySelector(".result").value);
+                    if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
+                        counter += numberValue;
+                    }
+                    document.getElementById('TotalAmount').textContent = counter.toFixed(2);
+                });
+            }
+
+            function TotalItems() {
+                let counter = 0;
+                rows.forEach(row => {
+                    const numberValue = parseFloat(row.querySelector(".input1").value);
+                    if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
+                        counter += numberValue;
+                    }
+                });
+                document.getElementById('ItemCount').textContent = counter;
+            }
+
             rows.forEach(row => {
                 const input1 = row.querySelector(".input1");
                 const input2 = row.querySelector(".input2");
                 const result = row.querySelector(".result");
                 const text = row.querySelector(".text1");
-
-                function TotalAmount() {
-                    let counter = 0;
-                    rows.forEach(row => {
-                        const numberValue = parseFloat(row.querySelector(".result").value);
-
-                        if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
-                            counter += numberValue;
-                        }
-                        document.getElementById('TotalAmount').textContent = counter.toFixed(2);
-                    });
-
-                }
 
                 function calculateAndUpdate() {
                     const value1 = parseFloat(input1.value) || 0;
@@ -378,21 +416,11 @@
                 }
 
                 text.addEventListener("input", IncreaseHeight);
-
-                function TotalItems() {
-                    let counter = 0;
-                    rows.forEach(row => {
-                        const numberValue = parseFloat(row.querySelector(".input1").value);
-
-                        if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
-                            counter += numberValue;
-                        }
-
-                    });
-                    document.getElementById('ItemCount').textContent = counter;
-                }
-
                 input1.addEventListener("input", TotalItems);
+                document.querySelectorAll('#table td input').forEach(cell => {
+                    cell.addEventListener('input', SaveTable);
+                });
+
             });
         });
 
@@ -409,7 +437,6 @@
                 console.error('Error generating PDF:', err);
             });
         });
-
     </script>
 
   </body>
