@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mhel Voi A. Bernabe</title>
+    <link rel="shortcut icon" type="image/x-icon" href="1x1.ico">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- Fontawesome -->
+    <script src="https://kit.fontawesome.com/117a758812.js" crossorigin="anonymous"></script>
+    
+    <!-- JSPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- HTML2CANVAS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        .input-error, input:invalid {
+            border-bottom: 1px solid red;
+            /* outline: none; */
+        }
+
+        table {
+            border-collapse: collapse; /* Ensures that borders are collapsed into a single border */
+            width: 100%; /* Optional: Makes the table take the full width */
+        }
+
+        table, 
+        table > * {
+            border: 1px solid #000 !important; /* Apply border to the table and all its children */
+        }
+
+        th, td {
+            border: 1px solid #000 !important; /* Apply border to header and data cells */
+            padding: 8px; /* Optional: Add padding for better readability */
+            text-align: left; /* Optional: Align text to the left */
+        }
+
+        .top-input {
+            margin: 0;
+            border: 0; 
+            margin-top: 5px;
+        }
+    </style>
+  </head>
+  <body class="font-monospace">
+    
+    <div style="background-color: #323639; min-height: 60px;" class="row text-center p-2">
+        <div class="col-sm-12 col-md-4 mt-2">
+            <button id="Download" class="btn rounded-pill btn-primary px-5 py-1 m-0"><i class="fa-regular fa-floppy-disk me-2"></i></i><small>SAVE AND EXIT</small></button>
+        </div>
+        <div class="col-sm-12 col-md-4 mt-2">
+            <button id="AddRow" class="btn rounded-pill btn-outline-light px-5 py-1 m-0"><i class="fa-solid fa-plus me-2"></i><small>NEW ROW ITEM</small></button>
+        </div>
+        
+        <div class="col-sm-12 col-md-4 mt-2">
+            <button id="Download" class="btn rounded-pill btn-danger px-5 py-1 m-0"><i class="fa-solid fa-download me-2"></i></i><small>DOWNLOAD TO PDF</small></button>
+        </div>
+    </div>
+
+    <div style="height: 100vh; overflow: auto; background-color: #525659;">
+        <div id="printable" class="h-100 mx-auto" style="background-color: #fff; padding: 50px; width: 1000px;">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-6" style="display: flex; align-items: center;">
+                        <p style="margin: 0;">CUSTOMER :</p>
+                        <input class="top-input" type="text" id="customer" required>
+                    </div>
+                    <div class="col-6" style="display: flex; align-items: center;">
+                        <p style="margin: 0;">SALE ID :</p>
+                        <input class="top-input" type="text" id="saleId" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6" style="display: flex; align-items: center;">
+                        <p style="margin: 0;">ADDRESS :</p>
+                        <input class="top-input" type="text" id="address" required>
+                    </div>
+                    <div class="col-6" style="display: flex; align-items: center;">
+                        <p style="margin: 0;">DATE :</p>
+                        <input class="top-input" type="text" id="date" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 d-flex align-items-center">
+                        <p style="margin: 0;">PAYMENT METHOD :</p>
+                        <input class="top-input" type="text" id="paymentMethod" required>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+
+            <table id="table" class="table">
+                <thead>
+                    <tr>
+                        <th colspan="7" style="text-align: center;"><small>QUOTE FORM</small></th>
+                    </tr>
+                    <tr>
+                        <th style="text-align: center;"><small>QTY</small></th>
+                        <th style="text-align: center;"><small>UNIT</small></th>
+                        <th style="text-align: center;"><small>ITEM</small></th>
+                        <th style="text-align: center;"><small>EXPIRY</small></th>
+                        <th style="text-align: center;"><small>LOT NO.</small></th>
+                        <th style="text-align: center;"><small>UNIT PRICE</small></th>
+                        <th style="text-align: center;"><small>TOTAL</small></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="p-0" style="max-width: 50px;">
+                            <small>
+                                <input oninput="TriggerFilter(this)" style="margin-top: 3px !important;" class="m-0 w-100 border-0 text-center input1" type="text">
+                            </small>
+                        </td>
+                        <td class="p-0" style="max-width: 56px;">
+                            <small>
+                                <input style="margin-top: 3px !important; padding-left: 10px;" class="m-0 w-100 border-0" type="text">
+                            </small>
+                        </td>
+                        <td class="p-0" style="max-width: 175px;">
+                            <small>
+                                <textarea style="resize: none; padding-left: 10px !important; margin-top: 4px !important;" class="m-0 p-0 w-100 border-0 text1" rows="1"></textarea>
+                            </small>
+                        </td>
+                        <td class="p-0" style="max-width: 75px;">
+                            <small>
+                                <input style="margin-top: 3px !important;" class="m-0 w-100 border-0 text-center" type="text">
+                            </small>
+                        </td>
+                        <td class="p-0" style="max-width: 75px;">
+                            <small>
+                                <input style="margin-top: 3px !important; padding-left: 10px;" class="m-0 w-100 border-0" type="text">
+                            </small>
+                        </td>
+                        <td class="p-0" style="max-width: 125px;">
+                            <small>
+                                <input oninput="TriggerFilter(this)" style="margin-top: 3px !important; padding-right: 10px;" class="m-0 w-100 border-0 text-end input2" type="text">
+                            </small>
+                        </td>
+                        <td class="p-0" style="max-width: 125px;">
+                            <small>
+                                <input style="margin-top: 3px !important; padding-right: 10px;" class="m-0 w-100 border-0 text-end result" type="text" readonly>
+                            </small>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2">
+                            <small class=" d-flex gap-1">
+                                <p class="m-0">
+                                    Item/s:
+                                </p>
+                                <p class="m-0" id="ItemCount">
+                                    0
+                                </p>
+                            </small>
+                        </th>
+                        <th>
+                            <small class="d-flex gap-1">
+                                <p class="m-0">
+                                    PREPARED BY:
+                                </p>
+                                <input type="text" class="border-0 m-0 text-uppercase" placeholder="MENVELUZ">
+                            </small>
+                        </th>
+                        <th colspan="2">
+                            <small class="d-flex gap-1">
+                                <p class="m-0">
+                                    TIME:
+                                </p>
+                                <p class="m-0" id="Time"></p>
+                            </small>
+                        </th>
+                        <th colspan="2">
+                            <small class="d-flex justify-content-end gap-1">
+                                <p class="m-0">
+                                    TOTAL AMOUNT:
+                                </p>
+                                <p class="m-0" id="TotalAmount">
+                                    0
+                                </p>
+                            </small>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            
+
+        </div>
+    </div>
+    
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function() {
+            function GetTime() {
+                const date = new Date();
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                const formattedTime = `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+                document.getElementById('Time').textContent = formattedTime;
+            }
+            GetTime();
+            setInterval(GetTime, 1000);
+
+            const table = document.getElementById("table");
+            const rows = table.querySelectorAll("tbody tr");
+
+            function TotalAmount() {
+                let counter = 0;
+                rows.forEach(row => {
+                    const numberValue = parseFloat(row.querySelector(".result").value);
+                    if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
+                        counter += numberValue;
+                    }
+                    document.getElementById('TotalAmount').textContent = counter.toFixed(2);
+                });
+            }
+
+            function TotalItems() {
+                let counter = 0;
+                rows.forEach(row => {
+                    const numberValue = parseFloat(row.querySelector(".input1").value);
+                    if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
+                        counter += numberValue;
+                    }
+                });
+                document.getElementById('ItemCount').textContent = counter;
+            }
+
+            rows.forEach(row => {
+                const input1 = row.querySelector(".input1");
+                const input2 = row.querySelector(".input2");
+                const result = row.querySelector(".result");
+                const text = row.querySelector(".text1");
+
+                function calculateAndUpdate() {
+                    const value1 = parseFloat(input1.value) || 0;
+                    const value2 = parseFloat(input2.value) || 0;
+                    const product = value1 * value2;
+                    result.value = product.toFixed(2);
+                    TotalAmount();
+                }
+
+                input1.addEventListener("input", calculateAndUpdate);
+                input2.addEventListener("input", calculateAndUpdate);
+
+                function IncreaseHeight() {
+                    text.style.height = 'auto';
+                    text.style.height = text.scrollHeight + 'px';
+                }
+
+                text.addEventListener("input", IncreaseHeight);
+
+                input1.addEventListener("input", TotalItems);
+            });
+        });
+
+        function SaveTable() {
+            const table = document.getElementById('table');
+            const rows = table.querySelectorAll('tbody tr');
+            TableData = [];
+            const primaryData = [];
+            primaryData.push(document.getElementById('customer').value);
+            primaryData.push(document.getElementById('saleId').value);
+            primaryData.push(document.getElementById('address').value);
+            primaryData.push(document.getElementById('date').value);
+            primaryData.push(document.getElementById('paymentMethod').value);
+            TableData.push(primaryData);
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                cells.forEach(cell => {
+                    const input = cell.querySelector('input');
+                    if (input) {
+                        rowData.push(input.value);
+                    }
+                });
+                TableData.push(rowData);
+            });
+            console.log(TableData);
+        }
+
+        document.querySelectorAll('#table td input').forEach(cell => {
+            cell.addEventListener('input', SaveTable);
+        });
+
+        function setInputFilter(textbox, inputFilter, errMsg) {
+            [ "input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop", "focusout" ].forEach(function(event) {
+                textbox.addEventListener(event, function(e) {
+                    if (inputFilter(this.value)) {
+                        if ([ "keydown", "mousedown", "focusout" ].indexOf(e.type) >= 0){
+                            this.classList.remove("input-error");
+                            this.setCustomValidity("");
+                        }
+                        this.oldValue = this.value;
+                        this.oldSelectionStart = this.selectionStart;
+                        this.oldSelectionEnd = this.selectionEnd;
+                    } else if (this.hasOwnProperty("oldValue")) {
+                        this.classList.add("input-error");
+                        this.setCustomValidity(errMsg);
+                        this.reportValidity();
+                        this.value = this.oldValue;
+                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                    } else {
+                        this.value = "";
+                    }
+                });
+            });
+        }
+
+        function TriggerFilter(data) {
+            setInputFilter(data, function(value) {
+                return /^\d*\.?\d*$/.test(value);
+            }, "Only digits and '.' are allowed");
+        }
+
+        document.getElementById('AddRow').addEventListener('click', function(event) {
+            const newRow = document.createElement('tr');
+            newRow.className = 'text-center';
+            newRow.innerHTML = `
+                <td class="p-0" style="max-width: 50px;">
+                    <small>
+                        <input oninput="TriggerFilter(this)" style="margin-top: 3px !important;" class="m-0 w-100 border-0 text-center input1" type="text">
+                    </small>
+                </td>
+                <td class="p-0" style="max-width: 56px;">
+                    <small>
+                        <input style="margin-top: 3px !important; padding-left: 10px;" class="m-0 w-100 border-0" type="text">
+                    </small>
+                </td>
+                <td class="p-0" style="max-width: 175px;">
+                    <small>
+                        <textarea style="resize: none; padding-left: 10px !important; margin-top: 4px !important;" class="m-0 p-0 w-100 border-0 text1" rows="1"></textarea>
+                    </small>
+                </td>
+                <td class="p-0" style="max-width: 75px;">
+                    <small>
+                        <input style="margin-top: 3px !important;" class="m-0 w-100 border-0 text-center" type="text">
+                    </small>
+                </td>
+                <td class="p-0" style="max-width: 75px;">
+                    <small>
+                        <input style="margin-top: 3px !important; padding-left: 10px;" class="m-0 w-100 border-0" type="text">
+                    </small>
+                </td>
+                <td class="p-0" style="max-width: 125px;">
+                    <small>
+                        <input oninput="TriggerFilter(this)" style="margin-top: 3px !important; padding-right: 10px;" class="m-0 w-100 border-0 text-end input2" type="text">
+                    </small>
+                </td>
+                <td class="p-0" style="max-width: 125px;">
+                    <small>
+                        <input style="margin-top: 3px !important; padding-right: 10px;" class="m-0 w-100 border-0 text-end result" type="text" readonly>
+                    </small>
+                </td>
+            `;
+            document.querySelector('#table tbody').appendChild(newRow);
+            const table = document.getElementById("table");
+            const rows = table.querySelectorAll("tbody tr");
+
+            function TotalAmount() {
+                let counter = 0;
+                rows.forEach(row => {
+                    const numberValue = parseFloat(row.querySelector(".result").value);
+                    if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
+                        counter += numberValue;
+                    }
+                    document.getElementById('TotalAmount').textContent = counter.toFixed(2);
+                });
+            }
+
+            function TotalItems() {
+                let counter = 0;
+                rows.forEach(row => {
+                    const numberValue = parseFloat(row.querySelector(".input1").value);
+                    if (!isNaN(numberValue) && Number.isFinite(numberValue)) {
+                        counter += numberValue;
+                    }
+                });
+                document.getElementById('ItemCount').textContent = counter;
+            }
+
+            rows.forEach(row => {
+                const input1 = row.querySelector(".input1");
+                const input2 = row.querySelector(".input2");
+                const result = row.querySelector(".result");
+                const text = row.querySelector(".text1");
+
+                function calculateAndUpdate() {
+                    const value1 = parseFloat(input1.value) || 0;
+                    const value2 = parseFloat(input2.value) || 0;
+                    const product = value1 * value2;
+                    result.value = product.toFixed(2);
+                    TotalAmount();
+                }
+
+                input1.addEventListener("input", calculateAndUpdate);
+                input2.addEventListener("input", calculateAndUpdate);
+
+                function IncreaseHeight() {
+                    text.style.height = 'auto';
+                    text.style.height = text.scrollHeight + 'px';
+                }
+
+                text.addEventListener("input", IncreaseHeight);
+                input1.addEventListener("input", TotalItems);
+                document.querySelectorAll('#table td input').forEach(cell => {
+                    cell.addEventListener('input', SaveTable);
+                });
+
+            });
+        });
+
+        document.getElementById('Download').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            html2canvas(document.getElementById('printable'), { scale: 4 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'pt', 'a4');
+                const imgWidth = 595;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.save('Quote_Form.pdf');
+            }).catch(err => {
+                console.error('Error generating PDF:', err);
+            });
+        });
+    </script>
+
+  </body>
+</html>
