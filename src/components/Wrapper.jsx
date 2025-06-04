@@ -1,15 +1,15 @@
 function Wrapper({ children }) {
-
   return (
-    <>
-      <div className="bg-[#525659] min-h-[100dvh] overflow-auto">
-        <div 
+    <div 
+      className="flex-grow overflow-auto flex min-h-full" 
+      style={{ backgroundColor: '#525659' }}>
+      <div 
         id="printable" 
-        className="bg-white mx-auto! p-[50px] w-[1000px]">
-            {children}
-        </div>
+        className="mx-auto! p-[50px] min-w-[1000px] min-h-full flex flex-col"
+        style={{ backgroundColor: '#ffffff', margin: '0 auto' }}>
+        {children}
       </div>
-    </>
+    </div>
   )
 }
 
