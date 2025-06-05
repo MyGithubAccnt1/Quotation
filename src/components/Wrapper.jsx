@@ -5,7 +5,7 @@ function Wrapper({ children }) {
       style={{ backgroundColor: '#525659' }}>
       <div 
         id="printable" 
-        className="mx-auto! p-[50px] min-w-[1000px] min-h-full flex flex-col"
+        className="mx-auto! p-[50px] min-w-[1000px] w-[1000px] min-h-full flex flex-col"
         style={{ backgroundColor: '#ffffff', margin: '0 auto' }}>
         {children}
       </div>

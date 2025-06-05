@@ -92,7 +92,7 @@ function App() {
     <div className="min-h-[100dvh] flex flex-col">
       <Header onAddRow={handleAddRow} />
       <Wrapper>
-        <div className="container mx-auto p-[25px]! pb-1!">
+        <div className="container mx-auto! p-[25px]! pb-1!">
           <table className="w-full border-collapse text-black">
             <tbody>
               <tr className="flex flex-wrap">
@@ -152,7 +152,7 @@ function App() {
           </table>
         </div>
 
-        <div className="container mx-auto p-[25px]! pt-1!">
+        <div className="container mx-auto! p-[25px]! pt-1!">
           <table id="table" className="text-black table-fixed w-full border-collapse border border-gray-400">
             <thead>
               <tr>
